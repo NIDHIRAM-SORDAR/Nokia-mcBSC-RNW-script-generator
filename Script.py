@@ -69,6 +69,14 @@ def add_omusig_entry():
     m_plane_ip_omusig = m_plane_ip
     subnet_omusig = subnet
 
+def delete_omusig_entry():
+    selected_indices = omusig_listbox.curselection()
+    if not selected_indices:
+        return
+    for index in selected_indices[::-1]:
+        omusig_listbox.delete(index)
+        del omusig_entries[index]
+
 def get_trx_number(trx_name):
     last_char = trx_name[-1]
     if last_char.isdigit():
@@ -81,7 +89,35 @@ def add_trxsig_entry():
     trx_number = get_trx_number(trx_name)
     bcxu = trxsig_bcxu_var.get()
     trxsig_entries.append((trx_name, trx_number, bcxu,))
-    trxsig_listbox.insert(tk.END, f"{trx_name}, {trx_number}, {bcxu},")
+    trxsig_listbox.insert(tk.END, f"{trx_name}, {trx_number}, {bcxu}")
+
+# Function to set IP & Subnet for TRXSIG
+def set_ip_and_subnet():
+    global m_plane_ip_omusig, subnet_omusig
+    m_plane_ip_omusig = simpledialog.askstring("Input", "Enter M-Plane IP for TRXSIG:", parent=root)
+    subnet_omusig = simpledialog.askstring("Input", "Enter Subnet for TRXSIG:", parent=root)
+    if not m_plane_ip_omusig or not subnet_omusig:
+        messagebox.showwarning("Warning", "Both M-Plane IP and Subnet must be provided!", parent=root)
+    else:
+        messagebox.showinfo("Info", "M-Plane IP and Subnet set successfully!", parent=root)
+
+# TRXSIG Tab
+def delete_trxsig_entry():
+    selected_indices = trxsig_listbox.curselection()
+    if not selected_indices:
+        return
+    for index in selected_indices[::-1]:
+        trxsig_listbox.delete(index)
+        del trxsig_entries[index]
+
+# Static Route Tab
+def delete_static_route_entry():
+    selected_indices = static_route_listbox.curselection()
+    if not selected_indices:
+        return
+    for index in selected_indices[::-1]:
+        static_route_listbox.delete(index)
+        del static_route_entries[index]
 
 def add_static_route_entry():
     etme = static_route_etme_var.get()
@@ -160,7 +196,7 @@ def save_all_scripts():
         with open(file_path, 'w') as file:
             file.write(all_scripts)
 
-root = ThemedTk(theme="arc")
+root = ThemedTk(theme="plastik")
 root.title("Script Generator")
 
 tab_control = ttk.Notebook(root)
@@ -204,7 +240,7 @@ ttk.Entry(omusig_tab, textvariable=subnet_var).grid(row=2, column=1, padx=10, pa
 
 ttk.Label(omusig_tab, text="TEI:").grid(row=3, column=0, padx=10, pady=5)
 tei_var = tk.StringVar()
-ttk.Entry(omusig_tab, textvariable=subnet_var).grid(row=3, column=1, padx=10, pady=5)
+ttk.Entry(omusig_tab, textvariable=tei_var).grid(row=3, column=1, padx=10, pady=5)
 
 ttk.Label(omusig_tab, text="BCXU:").grid(row=4, column=0, padx=10, pady=5)
 bcxu_var = tk.StringVar()
@@ -223,6 +259,8 @@ omusig_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
 omusig_listbox.config(yscrollcommand=omusig_scrollbar.set)
 
+ttk.Button(omusig_tab, text="Delete OMUSIG Entry", command=delete_omusig_entry).grid(row=6, column=4, columnspan=2, padx=10, pady=10)
+
 # TRXSIG Tab
 ttk.Label(trxsig_tab, text="TRX Name:").grid(row=0, column=0, padx=10, pady=5)
 trx_name_var = tk.StringVar()
@@ -233,7 +271,16 @@ trxsig_bcxu_var = tk.StringVar()
 trxsig_bcxu_menu = ttk.Combobox(trxsig_tab, textvariable=trxsig_bcxu_var, values=list(BCXUs.keys()))
 trxsig_bcxu_menu.grid(row=1, column=1, padx=10, pady=5)
 
-ttk.Button(trxsig_tab, text="Add TRXSIG Entry", command=add_trxsig_entry).grid(row=3, column=0, columnspan=2, pady=10)
+# Frame to contain the buttons
+button_frame = ttk.Frame(trxsig_tab)
+button_frame.grid(row=3, column=0, columnspan=2, pady=10)
+
+# Add "Add TRXSIG Entry" button
+ttk.Button(button_frame, text="Add TRXSIG Entry", command=add_trxsig_entry).pack(side=tk.LEFT, padx=10)
+
+# Add "Set IP & Subnet" button
+ttk.Button(button_frame, text="Set IP & Subnet", command=set_ip_and_subnet).pack(side=tk.LEFT, padx=10)
+
 # TRXSIG Listbox with Vertical Scrollbar
 trxsig_listbox_frame = ttk.Frame(trxsig_tab)
 trxsig_listbox_frame.grid(row=4, column=0, columnspan=2, padx=10, pady=5)
@@ -245,6 +292,8 @@ trxsig_scrollbar = ttk.Scrollbar(trxsig_listbox_frame, orient=tk.VERTICAL, comma
 trxsig_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
 trxsig_listbox.config(yscrollcommand=trxsig_scrollbar.set)
+
+ttk.Button(trxsig_tab, text="Delete TRXSIG Entry", command=delete_trxsig_entry).grid(row=4, column=4, columnspan=2, padx=10, pady=10)
 
 # Static Route Tab
 ttk.Label(static_route_tab, text="ETME:").grid(row=0, column=0, padx=10, pady=5)
@@ -274,6 +323,8 @@ static_route_scrollbar = ttk.Scrollbar(static_route_listbox_frame, orient=tk.VER
 static_route_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
 static_route_listbox.config(yscrollcommand=static_route_scrollbar.set)
+
+ttk.Button(static_route_tab, text="Delete Static Route Entry", command=delete_static_route_entry).grid(row=4, column=4, columnspan=2, padx=10, pady=10)
 
 # Generate and Save All Scripts Buttons
 generate_button = ttk.Button(root, text="Generate All Scripts", command=generate_all_scripts, state=tk.DISABLED)
