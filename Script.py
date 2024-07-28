@@ -59,7 +59,7 @@ subnet_omusig = None
 
 def add_omusig_entry():
     global m_plane_ip_omusig, subnet_omusig
-    name = name_var.get()
+    name = name_var.get().upper()
     m_plane_ip = m_plane_ip_var.get()
     subnet = subnet_var.get()
     bcxu = bcxu_var.get()
@@ -85,7 +85,7 @@ def get_trx_number(trx_name):
         return ord(last_char) - ord('A') + 10
 
 def add_trxsig_entry():
-    trx_name = trx_name_var.get()
+    trx_name = trx_name_var.get().upper()
     trx_number = get_trx_number(trx_name)
     bcxu = trxsig_bcxu_var.get()
     trxsig_entries.append((trx_name, trx_number, bcxu,))
@@ -122,17 +122,17 @@ def delete_static_route_entry():
 def add_static_route_entry():
     etme = static_route_etme_var.get()
     network_ip = network_ip_var.get()
-    subnet = subnet_var.get()
-    static_route_entries.append((etme, network_ip, subnet))
-    static_route_listbox.insert(tk.END, f"{etme}, {network_ip}, {subnet}")
+    subnet_static = subnet_var_static.get()
+    static_route_entries.append((etme, network_ip, subnet_static ))
+    static_route_listbox.insert(tk.END, f"{etme}, {network_ip}, {subnet_static}")
 
 def generate_omusig_script(entries):
     script = ""
     for name, m_plane_ip, subnet, bcxu, tei in entries:
         bcxu_number = list(BCXUs.keys()).index(bcxu)
         script += (
-            f"ZOYX:{name}:IUA:S:BCXU,0:AFAST:1;\n"
-            f"ZOYP:IUA:{name}:\"{BCXUs[bcxu]}\",,49152:\"{m_plane_ip}\",{subnet},,,49152;\n"
+            f"ZOYX:{name}:IUA:S:BCXU,{bcxu_number}:AFAST:1;\n"
+            f"ZOYP:IUA:{name}:\"{BCXUs[bcxu]["OMUSIG"]}\",,49152:\"{m_plane_ip}\",{subnet},,,49152;\n"
             f"ZDWP:{name}:BCXU,{bcxu_number}:62,{tei}:{name};\n"
             f"ZOYS:IUA:{name}:ACT;\n\n"
         )
@@ -157,7 +157,7 @@ def generate_trxsig_script(entries):
         
         script += (
             f"ZOYX:{trx_name}:IUA:S:BCXU,{bcxu_number}:AFAST:2;\n"
-            f"ZOYP:IUA:{trx_name}:\"{BCXUs[bcxu]}\",,{port}:\"{m_plane_ip_omusig}\",{subnet_omusig},,,{port};\n"
+            f"ZOYP:IUA:{trx_name}:\"{BCXUs[bcxu]["TRXSIG"]}\",,{port}:\"{m_plane_ip_omusig}\",{subnet_omusig},,,{port};\n"
             f"ZDWP:{trx_name}:BCXU,{bcxu_number}:0,{bcxu_number}:{trx_name};\n"
             f"ZOYS:IUA:{trx_name}:ACT;\n\n"
         )
@@ -167,10 +167,10 @@ def generate_trxsig_script(entries):
 
 def generate_static_route_script(entries):
     script = ""
-    for etme, network_ip, subnet in entries:
+    for etme, network_ip, subnet_static in entries:
         for etma in range(ETMAs):
             script += (
-                f"ZQKC:ETMA,{etma}::\"{network_ip}\",{subnet}:\"{ETMEs[etme]}\":LOG:;\n"
+                f"ZQKC:ETMA,{etma}::\"{network_ip}\",{subnet_static}:\"{ETMEs[etme]}\":LOG:;\n"
             )
     return script
 
@@ -308,8 +308,8 @@ network_ip_var = tk.StringVar()
 ttk.Entry(static_route_tab, textvariable=network_ip_var).grid(row=1, column=1, padx=10, pady=5)
 
 ttk.Label(static_route_tab, text="Subnet:").grid(row=2, column=0, padx=10, pady=5)
-subnet_var = tk.StringVar()
-ttk.Entry(static_route_tab, textvariable=subnet_var).grid(row=2, column=1, padx=10, pady=5)
+subnet_var_static = tk.StringVar()
+ttk.Entry(static_route_tab, textvariable=subnet_var_static).grid(row=2, column=1, padx=10, pady=5)
 
 ttk.Button(static_route_tab, text="Add Static Route Entry", command=add_static_route_entry).grid(row=3, column=0, columnspan=2, pady=10)
 # Static Route Listbox with Vertical Scrollbar
