@@ -7,6 +7,12 @@ import json
 BCXUs = {}
 ETMEs = {}
 ETMAs = 0
+omusig_entries = []
+trxsig_entries = []
+static_route_entries = []
+
+m_plane_ip_omusig = None
+subnet_omusig = None
 
 # Function to load configuration
 def load_config(bsc_name):
@@ -49,13 +55,6 @@ def update_bcxu_combobox():
         bcxu_menu['values'] = list(BCXUs.keys())
         trxsig_bcxu_menu['values'] = list(BCXUs.keys())
         static_route_etme_menu['values'] = list(ETMEs.keys())
-
-omusig_entries = []
-trxsig_entries = []
-static_route_entries = []
-
-m_plane_ip_omusig = None
-subnet_omusig = None
 
 def add_omusig_entry():
     global m_plane_ip_omusig, subnet_omusig
