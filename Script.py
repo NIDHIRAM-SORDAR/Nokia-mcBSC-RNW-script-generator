@@ -128,7 +128,7 @@ def add_static_route_entry():
 def generate_omusig_script(entries):
     script = ""
     for name, m_plane_ip, subnet, bcxu, tei in entries:
-        bcxu_number = list(BCXUs.keys()).index(bcxu)
+        bcxu_number = bcxu[-1]
         script += (
             f"ZOYX:{name}:IUA:S:BCXU,{bcxu_number}:AFAST:1;\n"
             f"ZOYP:IUA:{name}:\"{BCXUs[bcxu]['OMUSIG']}\",,49152:\"{m_plane_ip}\",{subnet},,,49152;\n"
@@ -140,7 +140,7 @@ def generate_omusig_script(entries):
 def generate_trxsig_script(entries):
     script = ""
     for trx_name, trx_number, bcxu in entries:
-        bcxu_number = list(BCXUs.keys()).index(bcxu)
+        bcxu_number = bcxu[-1]
         port = 49153 + (trx_number - 1)
         global m_plane_ip_omusig, subnet_omusig
         
@@ -157,7 +157,7 @@ def generate_trxsig_script(entries):
         script += (
             f"ZOYX:{trx_name}:IUA:S:BCXU,{bcxu_number}:AFAST:2;\n"
             f"ZOYP:IUA:{trx_name}:\"{BCXUs[bcxu]['TRXSIG']}\",,{port}:\"{m_plane_ip_omusig}\",{subnet_omusig},,,{port};\n"
-            f"ZDWP:{trx_name}:BCXU,{bcxu_number}:0,{bcxu_number}:{trx_name};\n"
+            f"ZDWP:{trx_name}:BCXU,{bcxu_number}:0,{trx_number}:{trx_name};\n"
             f"ZOYS:IUA:{trx_name}:ACT;\n\n"
         )
     return script
