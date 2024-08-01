@@ -131,7 +131,7 @@ def generate_omusig_script(entries):
         bcxu_number = list(BCXUs.keys()).index(bcxu)
         script += (
             f"ZOYX:{name}:IUA:S:BCXU,{bcxu_number}:AFAST:1;\n"
-            f"ZOYP:IUA:{name}:\"{BCXUs[bcxu]["OMUSIG"]}\",,49152:\"{m_plane_ip}\",{subnet},,,49152;\n"
+            f"ZOYP:IUA:{name}:\"{BCXUs[bcxu]['OMUSIG']}\",,49152:\"{m_plane_ip}\",{subnet},,,49152;\n"
             f"ZDWP:{name}:BCXU,{bcxu_number}:62,{tei}:{name};\n"
             f"ZOYS:IUA:{name}:ACT;\n\n"
         )
@@ -156,7 +156,7 @@ def generate_trxsig_script(entries):
         
         script += (
             f"ZOYX:{trx_name}:IUA:S:BCXU,{bcxu_number}:AFAST:2;\n"
-            f"ZOYP:IUA:{trx_name}:\"{BCXUs[bcxu]["TRXSIG"]}\",,{port}:\"{m_plane_ip_omusig}\",{subnet_omusig},,,{port};\n"
+            f"ZOYP:IUA:{trx_name}:\"{BCXUs[bcxu]['TRXSIG']}\",,{port}:\"{m_plane_ip_omusig}\",{subnet_omusig},,,{port};\n"
             f"ZDWP:{trx_name}:BCXU,{bcxu_number}:0,{bcxu_number}:{trx_name};\n"
             f"ZOYS:IUA:{trx_name}:ACT;\n\n"
         )
